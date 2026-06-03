@@ -1,6 +1,5 @@
 <template>
   <div
-    ref="orbitContainer"
     class="orbit-container relative z-10 shrink-0 mx-auto xl:mx-0"
     :class="isDesktopLayout ? 'overflow-visible' : 'overflow-hidden'"
     :style="containerStyle"
@@ -11,7 +10,6 @@
         :class="layoutMetrics.avatarSizeClass"
       >
         <img
-          ref="avatarEl"
           src="@/assets/my_pic_transparent.png"
           class="w-full h-full rounded-full object-cover block"
           alt="mohamed-haroun"
@@ -43,7 +41,7 @@
 
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, nextTick } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 import jsIcon from '@/assets/tech-icons/javascript-original.svg';
 import vueIcon from '@/assets/tech-icons/vuejs-original.svg';
@@ -69,11 +67,14 @@ const bgColors = [
 
 const DESKTOP_BREAKPOINT = 1200;
 
-const orbitContainer = ref(null);
-const avatarEl = ref(null);
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : DESKTOP_BREAKPOINT);
 const rotationAngle = ref(0);
-const orbitCenter = ref({ x: 112, y: 112 });
+
+const stackedTotalSize = (metrics) => {
+  const { avatarSize, iconSize, orbitRadius } = metrics;
+  const orbitPadding = orbitRadius + iconSize / 2 - avatarSize / 2;
+  return avatarSize + 2 * Math.max(orbitPadding, 0);
+};
 
 const icons = ref([
   { src: jsIcon, alt: 'JavaScript', bgColor: bgColors[0] },
@@ -103,7 +104,19 @@ const layoutMetrics = computed(() => {
     };
   }
 
-  // Stacked mobile/tablet: original orbit size; expanded container prevents text overlap
+  // Narrow phones: smaller orbit so the box fits typical viewports (container + px-4 padding)
+  if (w < 480) {
+    return {
+      avatarSize: 120,
+      iconSize: 52,
+      orbitRadius: 108,
+      iconImgSize: '26',
+      avatarSizeClass: 'w-[120px] h-[120px]',
+      iconSizeClass: 'w-[52px] h-[52px]',
+    };
+  }
+
+  // Stacked mobile/tablet: expanded container prevents text overlap
   return {
     avatarSize: 144,
     iconSize: 64,
@@ -112,6 +125,18 @@ const layoutMetrics = computed(() => {
     avatarSizeClass: 'w-36 h-36',
     iconSizeClass: 'w-16 h-16',
   };
+});
+
+const orbitCenter = computed(() => {
+  const metrics = layoutMetrics.value;
+
+  if (isDesktopLayout.value) {
+    const half = metrics.avatarSize / 2;
+    return { x: half, y: half };
+  }
+
+  const half = stackedTotalSize(metrics) / 2;
+  return { x: half, y: half };
 });
 
 const containerStyle = computed(() => {
@@ -126,8 +151,7 @@ const containerStyle = computed(() => {
     };
   }
 
-  const orbitPadding = orbitRadius + iconSize / 2 - avatarSize / 2;
-  const totalSize = avatarSize + 2 * Math.max(orbitPadding, 0);
+  const totalSize = stackedTotalSize(layoutMetrics.value);
 
   return {
     width: `${totalSize}px`,
@@ -141,18 +165,8 @@ const iconImageStyle = computed(() => ({
   transform: `rotate(${-rotationAngle.value}deg)`,
 }));
 
-const updateOrbitLayout = () => {
+const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
-
-  if (!avatarEl.value || !orbitContainer.value) return;
-
-  const avatarRect = avatarEl.value.getBoundingClientRect();
-  const containerRect = orbitContainer.value.getBoundingClientRect();
-
-  orbitCenter.value = {
-    x: avatarRect.left - containerRect.left + avatarRect.width / 2,
-    y: avatarRect.top - containerRect.top + avatarRect.height / 2,
-  };
 };
 
 const getIconStyle = (index) => {
@@ -177,7 +191,6 @@ const handleIconHover = (isHovered) => {
 };
 
 let rotationInterval;
-let resizeObserver;
 
 const startRotation = () => {
   rotationInterval = setInterval(() => {
@@ -185,26 +198,15 @@ const startRotation = () => {
   }, 50);
 };
 
-onMounted(async () => {
-  updateOrbitLayout();
+onMounted(() => {
+  updateWindowWidth();
   startRotation();
-  window.addEventListener('resize', updateOrbitLayout);
-
-  await nextTick();
-  updateOrbitLayout();
-
-  if (orbitContainer.value) {
-    resizeObserver = new ResizeObserver(() => {
-      updateOrbitLayout();
-    });
-    resizeObserver.observe(orbitContainer.value);
-  }
+  window.addEventListener('resize', updateWindowWidth);
 });
 
 onBeforeUnmount(() => {
   clearInterval(rotationInterval);
-  window.removeEventListener('resize', updateOrbitLayout);
-  resizeObserver?.disconnect();
+  window.removeEventListener('resize', updateWindowWidth);
 });
 </script>
 
