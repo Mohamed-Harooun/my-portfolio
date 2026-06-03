@@ -47,7 +47,7 @@ const downloadCV = () => {
   downloading.value = true;
   downloadError.value = false;
 
-  fetch('/Mohamed-Haroun-CV.pdf')
+  fetch('/Mohamed_haroun_Frontend_Developer_CV.pdf')
     .then((response) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -58,7 +58,7 @@ const downloadCV = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'Mohamed-Haroun-CV.pdf';
+      a.download = 'Mohamed_haroun_Frontend_Developer_CV.pdf';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
