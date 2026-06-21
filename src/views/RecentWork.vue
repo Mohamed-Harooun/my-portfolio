@@ -16,10 +16,16 @@
 import ProjectCard from '@/components/ProjectCard.vue';
 import MainHeading from '@/components/MainHeading.vue';
 
+/** Images for ako sayara website **/
 import akoSayara1 from "@/assets/projects/akosayara/1.png";
 import akoSayara2 from "@/assets/projects/akosayara/2.png";
 import akoSayara3 from "@/assets/projects/akosayara/3.png";
 import akoSayara4 from "@/assets/projects/akosayara/4.png";
+
+/** Images for bismar website **/
+import bismar1 from '@/assets/projects/bismar/1.png';
+import bismar2 from '@/assets/projects/bismar/2.png';
+import bismar3 from '@/assets/projects/bismar/3.png';
 
 /** Images for masaba website **/
 import masab1 from '@/assets/projects/masab/masab-sa-1.png';
@@ -80,6 +86,37 @@ const projects  = [
       {
         name: 'Pinia',
         src: pinia
+      }
+    ]
+  },
+  {
+    title: 'Bismar App',
+    images: [bismar1, bismar2, bismar3],
+    description: 'A B2B/B2C customer frontend built with Nuxt 3, Vue 3, and Vuetify. Engineered a robust, bilingual (EN/AR) e-commerce portal featuring complex state management via Pinia, form validation with VeeValidate, data visualization with ECharts, and document generation (PDF/Excel). Connected to a central REST API and Firebase for real-time capabilities',
+    demoLink: 'https://bismarapp.com',
+    githubLink: '',
+    demoLinkEnabled: true,
+    githubLinkEnabled: false,
+    techUsed: [
+      {
+        name: 'Nuxt.js',
+        src: nuxtjs
+      },
+      {
+        name: 'Vuetify',
+        src: vuetify
+      },
+      {
+        name: 'Swiper.js',
+        src: swiperjs
+      },
+      {
+        name: 'Pinia',
+        src: pinia
+      },
+      {
+        name: 'Firebase',
+        src: firebase
       }
     ]
   },
